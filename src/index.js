@@ -30,7 +30,7 @@ export default class CodeTool {
   }
 
   /**
-   * Allow to press Enter inside the CodeTool textarea
+   * Allow to press Enter inside the CodeTool codeblock
    *
    * @returns {boolean}
    * @public
@@ -63,12 +63,12 @@ export default class CodeTool {
       baseClass: this.api.styles.block,
       input: this.api.styles.input,
       wrapper: 'ce-code',
-      textarea: 'ce-code__textarea',
+      codeblock: 'ce-code__codeblock',
     };
 
     this.nodes = {
       holder: null,
-      textarea: null,
+      codeblock: null,
     };
 
     this.data = {
@@ -86,24 +86,24 @@ export default class CodeTool {
    */
   drawView() {
     const wrapper = document.createElement('div'),
-        textarea = document.createElement('textarea');
+        codeblock = document.createElement('code');
 
     wrapper.classList.add(this.CSS.baseClass, this.CSS.wrapper);
-    textarea.classList.add(this.CSS.textarea, this.CSS.input);
-    textarea.textContent = this.data.code;
+    codeblock.classList.add(this.CSS.codeblock, this.CSS.input);
+    codeblock.textContent = this.data.code;
 
-    textarea.placeholder = this.placeholder;
+    codeblock.placeholder = this.placeholder;
 
     if (this.readOnly) {
-      textarea.disabled = true;
+      codeblock.disabled = true;
     }
 
-    wrapper.appendChild(textarea);
+    wrapper.appendChild(codeblock);
 
     /**
      * Enable keydown handlers
      */
-    textarea.addEventListener('keydown', (event) => {
+    codeblock.addEventListener('keydown', (event) => {
       switch (event.code) {
         case 'Tab':
           this.tabHandler(event);
@@ -111,7 +111,7 @@ export default class CodeTool {
       }
     });
 
-    this.nodes.textarea = textarea;
+    this.nodes.codeblock = codeblock;
 
     return wrapper;
   }
@@ -129,13 +129,13 @@ export default class CodeTool {
   /**
    * Extract Tool's data from the view
    *
-   * @param {HTMLDivElement} codeWrapper - CodeTool's wrapper, containing textarea with code
+   * @param {HTMLDivElement} codeWrapper - CodeTool's wrapper, containing codeblock with code
    * @returns {CodeData} - saved plugin code
    * @public
    */
   save(codeWrapper) {
     return {
-      code: codeWrapper.querySelector('textarea').value,
+      code: codeWrapper.querySelector('code').value,
     };
   }
 
@@ -169,8 +169,8 @@ export default class CodeTool {
   set data(data) {
     this._data = data;
 
-    if (this.nodes.textarea) {
-      this.nodes.textarea.textContent = data.code;
+    if (this.nodes.codeblock) {
+      this.nodes.codeblock.textContent = data.code;
     }
   }
 
@@ -189,7 +189,7 @@ export default class CodeTool {
   }
 
   /**
-   * Default placeholder for CodeTool's textarea
+   * Default placeholder for CodeTool's codeblock
    *
    * @public
    * @returns {string}
@@ -240,10 +240,10 @@ export default class CodeTool {
      */
     event.preventDefault();
 
-    const textarea = event.target;
+    const codeblock = event.target;
     const isShiftPressed = event.shiftKey;
-    const caretPosition = textarea.selectionStart;
-    const value = textarea.value;
+    const caretPosition = codeblock.selectionStart;
+    const value = codeblock.value;
     const indentation = '  ';
 
     let newCaretPosition;
@@ -254,7 +254,7 @@ export default class CodeTool {
     if (!isShiftPressed) {
       newCaretPosition = caretPosition + indentation.length;
 
-      textarea.value = value.substring(0, caretPosition) + indentation + value.substring(caretPosition);
+      codeblock.value = value.substring(0, caretPosition) + indentation + value.substring(caretPosition);
     } else {
       /**
        * For Shift+Tab pressing, remove an indentation from the start of line
@@ -269,13 +269,13 @@ export default class CodeTool {
       /**
        * Trim the first two chars from the start of line
        */
-      textarea.value = value.substring(0, currentLineStart) + value.substring(currentLineStart + indentation.length);
+      codeblock.value = value.substring(0, currentLineStart) + value.substring(currentLineStart + indentation.length);
       newCaretPosition = caretPosition - indentation.length;
     }
 
     /**
      * Restore the caret
      */
-    textarea.setSelectionRange(newCaretPosition, newCaretPosition);
+    codeblock.setSelectionRange(newCaretPosition, newCaretPosition);
   }
 }
